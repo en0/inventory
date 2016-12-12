@@ -29,9 +29,6 @@ var paths = {
   ]
 };
 
-gulp.task('default', ['sass', 'compress']);
-//assets/libs/ionic/js/ionic.bundle.min.js
-
 gulp.task('sass', function(done) {
   gulp.src('./src/assets/styles/app.scss')
     .pipe(sass())
@@ -50,18 +47,19 @@ gulp.task('compress', function() {
     .pipe(concat('app.js'))
     .pipe(gulp.dest('./www'))
     .pipe(uglify({ mangle: false }))
-    .on('error', compress.logError)
+    .on('error', console.error)
     .pipe(gulp.dest('./www'))
 });
 
 gulp.task('copy', function() {
-    return gulp.src(paths.files)
+    return gulp.src(paths.files, { base: './src' })
     .pipe(gulp.dest('./www'));
-}
+});
 
 gulp.task('watch', ['sass'], function() {
   gulp.watch(paths.sass, ['sass']);
   gulp.watch(paths.js, ['compress']);
+  gulp.watch(paths.files, ['copy']);
 });
 
 gulp.task('install', ['git-check'], function() {
@@ -83,3 +81,5 @@ gulp.task('git-check', function(done) {
   }
   done();
 });
+
+gulp.task('default', ['sass', 'compress', 'copy']);
